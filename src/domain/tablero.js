@@ -1,17 +1,21 @@
 import Matriz from "./matriz";
+import { TAM_TABLERO_ALTO } from '../styles/constantes';
 
 export default class Tablero{
     dimensiones;
     matriz;
     piezas = [];
-    static cantidad_piezas_colocadas = 0;
 
-    constructor(n,m){
+    //N = fila = x
+    //M = columna = y
+
+    constructor(n,m, altura_habilitada){
         this.dimensiones = {
             n: n,
             m: m
         };
         this.matriz = new Matriz(n,m);
+        this.matriz.instanciar_inhabilitados(TAM_TABLERO_ALTO - altura_habilitada, 0);
     }
 
     puedeCombinar(nuevaPieza, x_tablero, y_tablero, x_pieza, y_pieza){
@@ -21,7 +25,7 @@ export default class Tablero{
     agregarPieza(componente, nuevaPieza, x_tablero, y_tablero, x_pieza, y_pieza){
         Tablero.cantidad_piezas_colocadas++;
         let pieza_colocada = {
-            id: Tablero.cantidad_piezas_colocadas,
+            id: nuevaPieza.id,
             componente: componente,
             pieza: nuevaPieza,
             x_tablero: x_tablero,
@@ -49,10 +53,7 @@ export default class Tablero{
 
     obtenerColorPiezaColocada(id){
         let pieza = this.obtenerPiezaColocada(id)
-        if(pieza != null){
-            return pieza.color;
-        }
-        return null;
+        return pieza.pieza.color;
     }
 
     estaCompleto(){
@@ -60,10 +61,10 @@ export default class Tablero{
     }
 
     obtenerPiezaColocada(id){
-        let colocacion = this.piezas.find(_colocacion => _colocacion.id == id);
-        if (colocacion != null){
-            return colocacion;
-        }
-        return null;
+        return this.piezas.find(_colocacion => _colocacion.id == id);
+    }
+
+    getCordenada(x,y){
+        return this.matriz.matriz[Math.min(x, this.dimensiones.n - 1)][Math.min(y, this.dimensiones.m - 1)]
     }
 }

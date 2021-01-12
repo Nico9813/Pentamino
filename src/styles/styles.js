@@ -3,16 +3,13 @@ import { INICIO_TABLERO, TAM_PARTE_PIEZA, TAM_PARTE_TABLERO, DIMENSIONES_PIEZA, 
 
 export const Styles = StyleSheet.create({
     container: {
-        backgroundColor: 'black',
+        backgroundColor:'black',
         padding: 10,
         justifyContent: 'center',
         alignContent: 'center'
     },
     titulo:{
         color: 'white'
-    },
-    fondo:{
-        backgroundColor: 'black'
     },
     parte_pieza:{
         height: TAM_PARTE_PIEZA,
@@ -36,7 +33,6 @@ export const Styles = StyleSheet.create({
     },
     footer:{
         position: "absolute",
-        opacity: 0.5,
         top: 0
     }
 });

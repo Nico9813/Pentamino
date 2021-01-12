@@ -13,7 +13,7 @@ const puzzleStore = configureStore();
 
 export default function App() {
   return (
-    <Container style={Styles.fondo}>
+    <Container>
       <StatusBar></StatusBar>
       <Provider store={puzzleStore}>
       <Navegador />

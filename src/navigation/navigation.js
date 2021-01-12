@@ -1,7 +1,5 @@
-import React from 'react';
-
-import Home from '../scenes/Home'
-import PantallaJuego from '../scenes/PantallaJuego'
+import { Home } from '../scenes/Home'
+import { PantallaJuego } from '../scenes/PantallaJuego'
 
 import { createStackNavigator } from 'react-navigation-stack';
 import { createAppContainer } from 'react-navigation';

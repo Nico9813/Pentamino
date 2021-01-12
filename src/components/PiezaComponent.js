@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, PanResponder, Animated, TouchableOpacity } from 'react-native';
+import { View, PanResponder, Animated, TouchableOpacity, Text } from 'react-native';
 
 import { Styles } from '../styles/styles';
 
@@ -11,15 +11,10 @@ import { INICIO_TABLERO, TAM_PARTE_TABLERO, TAM_PARTE_PIEZA, TAM_TABLERO_ANCHO, 
 class PiezaComponent extends React.Component {
 
     state = {
-        pieza: this.props.piezaActual,
+        pieza: this.props.pieza,
         cordenadasPieza: { x: 0, y: 0 },
         pan: new Animated.ValueXY(),
         scale: new Animated.Value(1),
-        cordenadasValidas: true
-    }
-
-    componentDidMount(){
-
     }
 
     constructor(props) {
@@ -32,17 +27,14 @@ class PiezaComponent extends React.Component {
         this.panResponder = PanResponder.create({
             onStartShouldSetPanResponder: () => true,
             onMoveShouldSetPanResponderCapture: (evt, gestureState) => {
-                return gestureState.dx != 0 && gestureState.dy != 0;
+                return (gestureState.dx != 0 && gestureState.dy != 0);
             },
-            onPanResponderGrant: (evt, gestureState) => {
-                let cordenadas = this.getCordenadasPieza(evt.nativeEvent.locationX, evt.nativeEvent.locationY)
+            onPanResponderGrant: (evt) => {
                 this.setState({ ...this.state, 
                     cordenadasPieza: { x: evt.nativeEvent.locationX, y: evt.nativeEvent.locationY }, 
-                    cordenadasValidas: this.state.pieza.matriz.matriz[cordenadas.y][cordenadas.x]
                 })
             },
             onPanResponderMove: (evt, gesture) => { 
-                if (this.state.cordenadasValidas == true){
                     this.state.pan.y.setValue(gesture.dy)
                     this.state.pan.x.setValue(gesture.dx)
                     if (evt.nativeEvent.pageX > INICIO_TABLERO.x) {
@@ -50,23 +42,20 @@ class PiezaComponent extends React.Component {
                             toValue: TAM_PARTE_TABLERO / TAM_PARTE_PIEZA
                         }).start();
                     }
-                }
             },
             onPanResponderRelease: (e, gesture) => {
-                if(this.state.cordenadasValidas == true){
                     if (this.estaEnTablero(gesture.moveX, gesture.moveY)) {
-
                         let cordenadasPieza = this.getCordenadasPieza(this.state.cordenadasPieza.x, this.state.cordenadasPieza.y)
                         let cordenadasTablero = this.getPosicionEnTablero(gesture.moveX, gesture.moveY)
-                        if (this.props.tablero.puedeAgregar(this.props.piezaActual, cordenadasPieza, cordenadasTablero)) {
-                            this.props.tablero.agregarPieza(this, this.state.pieza, cordenadasPieza, cordenadasTablero)
+                        if (this.props.puedeAgregar(this.props.pieza, cordenadasTablero, cordenadasPieza)) {
+                            this.props.agregarPieza(this, this.state.pieza, cordenadasTablero, cordenadasPieza)
+                            this.reiniciarPieza()
                         } else {
                             this.reiniciarPieza()
                         }
                     } else {
                         this.reiniciarPieza()
-                    }
-                }
+                    }   
             }
         });
     }
@@ -122,19 +111,27 @@ class PiezaComponent extends React.Component {
                 {...this.panResponder.panHandlers}
                 style={this.state.pan.getLayout()}>
 
-                {(this.props.piezaActual != undefined) ?
+                {(this.props.libre) ?
                     <TouchableOpacity activeOpacity={0.5} onPress={() => this.rotarPieza()} onLongPress={() => this.espejarPieza()}>
                         <Animated.View style={[Styles.contenedor_pieza, { transform: [{ scale: this.state.scale }] }]} pointerEvents="box-only" >
                             {
-                                this.props.piezaActual.matriz.matriz.map((rowData, index) => (
+                                this.props.pieza.matriz.matriz.map((rowData, index) => (
                                     <View pointerEvents="none" key={index} style={[Styles.parte_pieza, { flexDirection: 'row'}]}>
                                         {
                                             rowData.map((cellData, cellIndex) => (
                                                 <View pointerEvents="none" id={cellIndex} key={cellIndex}>
-                                                    <View key={cellIndex} style={[Styles.parte_pieza, { flexDirection: 'column'}, (cellData != 0) && { backgroundColor: this.props.piezaActual.color, borderColor: 'white', borderWidth: 0.5, borderRadius:2}]}></View>
+                                                    <View key={cellIndex} 
+                                                    style={[
+                                                        Styles.parte_pieza, 
+                                                        { 
+                                                            flexDirection: 'column'}, 
+                                                            (cellData != 0) && { backgroundColor: this.props.pieza.color, borderColor: 'black', borderWidth: 0.5, borderRadius:2
+                                                        }
+                                                        ]}></View>
                                                 </View>
                                             ))
                                         }
+                                        
                                     </View>
                                 ))
                             }
@@ -151,24 +148,4 @@ class PiezaComponent extends React.Component {
     }
 }
 
-const mapStateToProps = (state, prevPops) => {
-
-    return {
-        matriz: state.matriz_tablero_actual,
-        piezas_tablero: state.piezas_tablero_actual,
-        piezas: state.piezas_actuales,
-        piezaActual: state.piezas_actuales.find(pieza => pieza.id == prevPops.pieza_id)
-    }
-};
-
-const mapDispatchToProps = (dispatch) => {
-    return {
-        _cambiar_matriz_tablero_actual: (matriz) => dispatch(cambiarMatrizTableroActual(matriz)),
-        _quitar_pieza_disponibles: (pieza) => dispatch(quitarPiezaDisponibles(pieza)),
-        _quitar_pieza_tablero: (pieza) => dispatch(quitarPiezaTablero(pieza)),
-        _agregar_pieza_disponibles: (pieza) => dispatch(agregarPiezaDisponibles(pieza)),
-        _agregar_pieza_tablero: (pieza) => dispatch(agregarPiezaTablero(pieza)),
-    }
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(PiezaComponent);
+export default PiezaComponent;
