@@ -1,29 +1,50 @@
-import React, { useState } from 'react';
-import { Button, Text, FlatList, ImageBackground, StatusBar } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Text, FlatList, StatusBar } from 'react-native';
 import { Card, CardItem,H2, Container } from 'native-base';
 
 import { Styles } from '../styles/styles';
 
-import { connect } from 'react-redux';
-import { cambiarMatrizTableroActual, agregarPiezaDisponibles } from '../data/acciones';
-
 import { TouchableOpacity } from 'react-native-gesture-handler';
 import { NivelesActuales } from '../NivelesActuales'
+import AsyncStorage from '@react-native-community/async-storage';
 const COLORES_LISTA = ['#6600cc', '#0099cc', '#4d9900','#cc0000']
 
 export const Home = (props) => {
 
     const [niveles, setNiveles] = useState(NivelesActuales)
+    const [ready, setReady ] = useState(false)
+
+    useEffect(() =>{
+        async function readData(){
+            const keys = await AsyncStorage.getAllKeys()
+            for(let i=0; i < keys.length; i++){
+                const key = keys[i]
+                const resolucion_actual = await AsyncStorage.getItem(key)
+                niveles[key].completado = true
+                niveles[key].resolucion = JSON.parse(resolucion_actual)
+                setNiveles(niveles)
+            }
+        }
+        readData()
+    }, [])
 
     const goToLevel = (nivel) => {
         props.navigation.navigate('PantallaJuego', { nivel: nivel, completarLevel: completarLevel })
     }
 
-    const completarLevel = (nivel, matrizFinal, colocaciones) => {
+    const getProximoNivel = (nivel) => niveles.find( nivel_actual => !nivel_actual.completado && nivel_actual.numero > nivel.numero)
+
+    const completarLevel = (nivel, matrizFinal, colocacionesFinales) => {
+        const proximo_nivel = getProximoNivel(nivel)
+        if (proximo_nivel) props.navigation.navigate('PantallaJuego', { nivel: proximo_nivel, completarLevel: completarLevel })
+        const colocaciones_sin_componente = colocacionesFinales.map(colocacion => {return({...colocacion, componente: null})})
         setNiveles(niveles.map(nivelActual => {
-            return ( nivelActual.numero != nivel.numero ? nivelActual : {...nivelActual, completado: true, resolucion: {matrizFinal, colocaciones}}
-           ) 
-        }))
+            return (nivelActual.numero != nivel.numero ? nivelActual : { ...nivelActual, completado: true, resolucion: { matrizFinal, colocaciones: colocacionesFinales } }
+        )}))
+        async function guardarResolucion(){
+            await AsyncStorage.setItem(JSON.stringify(nivel.numero), JSON.stringify({ matrizFinal, colocaciones: colocaciones_sin_componente }))
+        }
+        guardarResolucion()
     }
 
     const renderNivel = (nivel, indice) => 

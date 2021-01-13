@@ -33,6 +33,12 @@ export const Styles = StyleSheet.create({
     },
     footer:{
         position: "absolute",
-        top: 0
+        top: '10%'
+    },
+    contenedor_titulo:{
+        display:'flex',
+        justifyContent:'space-between',
+        flexDirection: 'row',
+        padding:50
     }
 });

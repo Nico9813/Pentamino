@@ -21,7 +21,7 @@ for(let i = 0; i<TablaNiveles.length;i++){
             piezasIniciales.push(TablaNiveles[i][k])
         }
         NivelesActuales.push({
-            numero: 1 + NivelesActuales.length,
+            numero: NivelesActuales.length,
             altura: j,
             piezasIniciales: piezasIniciales,
             completado: false,

@@ -3,9 +3,6 @@ import { View, PanResponder, Animated, TouchableOpacity, Text } from 'react-nati
 
 import { Styles } from '../styles/styles';
 
-import { connect } from 'react-redux';
-import { cambiarMatrizTableroActual, quitarPiezaDisponibles, quitarPiezaTablero, agregarPiezaDisponibles, agregarPiezaTablero } from '../data/acciones';
-
 import { INICIO_TABLERO, TAM_PARTE_TABLERO, TAM_PARTE_PIEZA, TAM_TABLERO_ANCHO, TAM_TABLERO_ALTO, DIMENSIONES_PIEZA } from '../styles/constantes'
 
 class PiezaComponent extends React.Component {

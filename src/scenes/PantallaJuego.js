@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { StatusBar, View } from 'react-native';
+import { StatusBar, View, Button } from 'react-native';
 import { AppLoading } from 'expo';
-import { Container, H2, Right } from 'native-base';
+import { Container, H2, Right, Left } from 'native-base';
 
 import {TableroComponent} from '../components/TableroComponent';
 
@@ -15,19 +15,24 @@ export const PantallaJuego = (props) => {
     
     const { altura, piezasIniciales, completado } = nivel
 
-    const [tablero, setTablero] = useState(new Tablero(TAM_TABLERO_ALTO, TAM_TABLERO_ANCHO, altura))
+    const [ tablero, setTablero ] = useState(new Tablero(TAM_TABLERO_ALTO, TAM_TABLERO_ANCHO, altura))
+    const [ terminado, setTerminado ] = useState(completado)
     const [ piezasDisponibles, setPiezasDisponibles ] = useState([])
 
     useEffect( () => {
         let tableroInicial = new Tablero(TAM_TABLERO_ALTO, TAM_TABLERO_ANCHO, altura)
         if (completado){
-            const {matrizFinal, colocaciones} = nivel.resolucion
+            const { matrizFinal, colocaciones } = nivel.resolucion
             tableroInicial.matriz = matrizFinal
             tableroInicial.piezas = colocaciones
         }else{
             setPiezasDisponibles(piezasIniciales)
         }
-        setTablero(tableroInicial)
+        async function set() { 
+            await setTablero(tableroInicial) 
+        }
+        set()
+        
     }, [])
 
     const quitarPiezaTablero = (x, y) => {
@@ -43,6 +48,13 @@ export const PantallaJuego = (props) => {
         completarLevel(nivel, tablero.matriz, tablero.piezas)
     }
 
+    const reiniciarNivel = () => {
+        tablero.piezas.forEach( pieza => {if(pieza.componente) pieza.componente.reiniciarPieza()})
+        setTablero(new Tablero(TAM_TABLERO_ALTO, TAM_TABLERO_ANCHO, altura))
+        setPiezasDisponibles(piezasIniciales)
+        setTerminado(false)
+    }
+
     const agregarPiezaTablero = (componente, pieza, cordenadas_tablero, cordenadas_pieza) => {
         tablero.agregarPieza(componente, pieza, cordenadas_tablero.y, cordenadas_tablero.x, cordenadas_pieza.x, cordenadas_pieza.y)
         setTablero(tablero)
@@ -52,12 +64,19 @@ export const PantallaJuego = (props) => {
 
     return (
         <Container style={{ overflow: 'visible', backgroundColor:"black" }}>
-            <TableroComponent tablero={tablero} completado={completado} piezasDisponibles={piezasDisponibles} piezasIniciales={piezasIniciales} agregarPieza={agregarPiezaTablero} quitarPieza={quitarPiezaTablero} ganarNivel={ganarNivel}/>
-            <View style={Styles.container}>
+            <TableroComponent 
+                tablero={tablero} 
+                completado={terminado} 
+                piezasDisponibles={piezasDisponibles} 
+                piezasIniciales={piezasIniciales} 
+                agregarPieza={agregarPiezaTablero} 
+                quitarPieza={quitarPiezaTablero} 
+                ganarNivel={ganarNivel}
+            />
                 <StatusBar translucent={true} backgroundColor={'transparent'}></StatusBar>
-                <Right>
-                    <H2 style={Styles.titulo}>Nivel {nivel.numero}</H2>
-                </Right>
+            <View style={Styles.contenedor_titulo}>
+                <H2 style={Styles.titulo}>Nivel {nivel.numero}</H2>
+                <Button title="Reiniciar" onPress={reiniciarNivel}></Button>
             </View>
         </Container>
     )

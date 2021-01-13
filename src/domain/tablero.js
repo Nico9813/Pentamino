@@ -16,6 +16,7 @@ export default class Tablero{
         };
         this.matriz = new Matriz(n,m);
         this.matriz.instanciar_inhabilitados(TAM_TABLERO_ALTO - altura_habilitada, 0);
+        this.piezas = []
     }
 
     puedeCombinar(nuevaPieza, x_tablero, y_tablero, x_pieza, y_pieza){
@@ -52,8 +53,7 @@ export default class Tablero{
     }
 
     obtenerColorPiezaColocada(id){
-        let pieza = this.obtenerPiezaColocada(id)
-        return pieza.pieza.color;
+        return this.obtenerPiezaColocada(id)?.pieza.color;
     }
 
     estaCompleto(){
