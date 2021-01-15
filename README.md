@@ -1,5 +1,5 @@
 # Pentamino
-Adaptación del juego Pentamino realizado en react-native (Expo) 
+Adaptación del juego de mesa Pentamino realizado en react-native (Expo) mediante utilizacion de matrices para representar tanto el tablero y las piezas como sus rotaciones y superposiciones. Para la generacion de niveles se utilizo la tabla del manual de dicho juego.
 
 # Capturas
 <p float="left">
@@ -10,6 +10,5 @@ Adaptación del juego Pentamino realizado en react-native (Expo)
 # Herramientas utilizadas
 - React-native
 - Expo
-- Redux
 - React-navigation
 - Pan-responder
